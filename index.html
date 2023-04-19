@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Extract data from HTML code with our easy-to-use online Beautifulsoup parser tool. Parse HTML tables, lists, and more in seconds. Try it now!">
+    <meta charset="UTF-8">
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="icon" href="B.png" type="image/x-icon">
+    <title>Online Beautifulsoup Parser Tool - Parse HTML Code</title>
+
+
+    <!-- TO-DO: add a css effect to run when pyodide is loading -->
+    <!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" /> -->
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.18.1/full/pyodide.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+  </head>
+  <body>
+
+    <nav class="navbar">
+        <div class="navbar-item"><h3>beautifulsoup4</h3></div>
+    </nav>
+
+    <div class="container">
+        
+        <textarea class="html-input shadow" name="html-input" id="html-input" ></textarea>
+        
+
+        <div class="selector-input-zone ">
+            <button class="selector-btn shadow", id="send">Run selector</button>
+            <input class="selector-css-input shadow"  id="selector-input" type="text" >
+        </div>
+
+        <div class="result-container" id="result-container">
+
+        </div>
+    </div>
+
+    <py-env>
+      - beautifulsoup4
+    </py-env>
+
+    <py-script>
+from bs4 import BeautifulSoup
+import js
+from pyodide import create_proxy
+
+
+def extract(event=None):
+    html = js.document.getElementById("html-input").value
+    selector = js.document.getElementById("selector-input").value
+    results = []
+
+    if html and selector:
+        soup = BeautifulSoup(html, "html.parser")
+        results = soup.select(selector)
+
+    if len(results) == 0:
+        results.append("no results found")
+
+    for result in results:
+        container = js.document.getElementById("result-container");
+
+        textarea = js.document.createElement("textarea");
+        textarea.setAttribute("class", "result-html shadow");
+        textarea.setAttribute("name", "html-result");
+        textarea.setAttribute("readonly", "");
+        textarea.innerText = result
+
+        container.appendChild(textarea);
+        
+
+extract_proxy = create_proxy(extract)
+js.document.getElementById('send').addEventListener("click",extract_proxy)
+
+    </py-script>
+
+  </body>
+</html>
